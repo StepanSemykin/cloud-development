@@ -8,7 +8,7 @@ namespace GenerationService.Services;
 public interface IGeneratorService
 {
     /// <summary>
-    /// Обработка запроса на генерацию данных пациента с указанным идентификатором.
+    /// Обрабатывает запрос на генерацию данных пациента с указанным идентификатором.
     /// </summary>
     /// <param name="id">Идентификатор пациента.</param>
     /// <returns>Сгенерированный объект <see cref="MedicalPatient"/> с заполненными полями.</returns>
