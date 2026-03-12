@@ -1,7 +1,7 @@
+using Domain.Entities;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
-using Domain.Entities;
 
 namespace CachingService.Services;
 
@@ -10,9 +10,8 @@ namespace CachingService.Services;
 /// </summary>
 public class CacheService(IDistributedCache cache, IConfiguration configuration) : ICacheService
 {
-    private readonly TimeSpan _cacheExpiration =  int.TryParse(configuration["CacheTime"], out var sec)
-        ? TimeSpan.FromSeconds(sec)
-        : TimeSpan.FromSeconds(3600);
+    private readonly TimeSpan _cacheExpiration =
+        TimeSpan.FromSeconds(configuration.GetValue<int?>("Cache:CacheTime") ?? 60);
 
     /// <summary>
     /// Извлекает данные пациента из кэша по идентификатору.

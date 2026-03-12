@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using CachingService.Services;
+﻿using CachingService.Services;
 using Domain.Entities;
 
 namespace GenerationService.Services;
@@ -40,7 +39,7 @@ public class GeneratorService(ICacheService cacheService, ILogger<GeneratorServi
         MedicalPatient patient;
         try
         {
-            patient = Generator.GenerateAsync(id);
+            patient = Generator.Generate(id);
             logger.LogInformation("Patient with Id {Id} generated.", id);
         }
         catch (Exception ex)

@@ -11,37 +11,37 @@ public class MedicalPatient
     /// Идентификатор пациента.
     /// </summary>
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public required int Id { get; set; }
 
     /// <summary>
     /// Имя.
     /// </summary>
     [JsonPropertyName("name")]
-    public string? Name { get; set; }
+    public required string Name { get; set; }
 
     /// <summary>
     /// Адрес.
     /// </summary>
     [JsonPropertyName("address")]
-    public string? Address { get; set; }
+    public required string Address { get; set; }
 
     /// <summary>
     /// Дата рождения.
     /// </summary>
     [JsonPropertyName("birthDate")]
-    public DateOnly? BirthDate { get; set; }
+    public required DateOnly BirthDate { get; set; }
 
     /// <summary>
     /// Рост в метрах.
     /// </summary>
     [JsonPropertyName("height")]
-    public double? Height { get; set; }
+    public required double Height { get; set; }
 
     /// <summary>
-    /// Вес в килограммах.
+    /// Масса в килограммах.
     /// </summary>
     [JsonPropertyName("weight")]
-    public double? Weight { get; set; }
+    public required double Weight { get; set; }
 
     /// <summary>
     /// Группа крови.
