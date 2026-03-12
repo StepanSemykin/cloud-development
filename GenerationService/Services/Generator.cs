@@ -12,8 +12,8 @@ public static class Generator
     private const double MaxAdultHeight = 2.20;
     private const int BloodGroupCount = 4;
     private const int MaxAge = 120;
-    private const int MinBmi = 15;
-    private const int MaxBmi = 40;
+    private const int MinBmi = 18;
+    private const int MaxBmi = 30;
 
     private const int DigitsRound = 2;
 
@@ -29,6 +29,24 @@ public static class Generator
         .RuleFor(m => m.Vaccination, f => f.Random.Bool());
 
     /// <summary>
+    /// Определяет диапазон роста на основе возраста.
+    /// </summary>
+    /// <param name="age">Возраст пациента в годах.</param>
+    /// <returns>Минимальный и максимальный рост для данного возраста.</returns>
+    private static (double Min, double Max) GetHeightRangeByAge(double age)
+    {
+        return age switch
+        {
+            < 1 => (0.35, 0.80),
+            < 3 => (0.80, 1.00),
+            < 7 => (1.00, 1.30),
+            < 13 => (1.30, 1.60),
+            < 18 => (1.60, 1.90),
+            _ => (MinAdultHeight, MaxAdultHeight)
+        };
+    }
+
+    /// <summary>
     /// Генерирует рост пациента на основе возраста.
     /// </summary>
     /// <param name="birthDate">Дата рождения пациента.</param>
@@ -37,16 +55,9 @@ public static class Generator
     private static double GenerateHeightByAge(DateOnly birthDate, Faker faker)
     {
         var age = CalculateAge(birthDate);
+        var (minHeight, maxHeight) = GetHeightRangeByAge(age);
 
-        return age switch
-        {
-            < 1 => faker.Random.Double(0.35, 0.80),
-            < 3 => faker.Random.Double(0.80, 1.00),
-            < 7 => faker.Random.Double(1.00, 1.30),
-            < 13 => faker.Random.Double(1.30, 1.60),
-            < 18 => faker.Random.Double(1.60, 1.90),
-            _ => faker.Random.Double(MinAdultHeight, MaxAdultHeight)
-        };
+        return Math.Round(faker.Random.Double(minHeight, maxHeight), DigitsRound);
     }
 
     /// <summary>
@@ -59,7 +70,7 @@ public static class Generator
     {
         var bmi = faker.Random.Double(MinBmi, MaxBmi);
 
-        return Math.Round(bmi * height * height, DigitsRound);
+        return (int)(bmi * height * height);
     }
 
     /// <summary>
