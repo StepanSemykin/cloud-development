@@ -29,4 +29,24 @@
 
 ![3](https://github.com/user-attachments/assets/bb429a0c-7553-4c5c-b863-4bacf5c5b67a)
 
+### Лабораторная работа №2
+<details>
+<summary>2. «Балансировка нагрузки» - Реализация апи гейтвея, настройка его работы</summary>
+<br>
+  
+В рамках второй лабораторной работы необходимо:
+* Настроить оркестрацию на запуск нескольких реплик сервиса генерации,
+* Реализовать апи гейтвей на основе Ocelot,
+* Имплементировать алгоритм балансировки нагрузки согласно варианту.
+</details>
+
+Реализовано:
+1. ApiGateway: *ApiGateway*
+2. Балансировщик нагрузки WeightedRandomBalancer: *ApiGateway/LoadBalancer*
+
+Примеры интерфейса: 
+![4](https://github.com/user-attachments/assets/469da2a1-2431-4faa-9e25-0cb7596a3352)
+
+![5](https://github.com/user-attachments/assets/26bbde9a-8b7c-458b-9835-b1a933d47df5)
+
 
