@@ -11,7 +11,7 @@ namespace CachingService.Services;
 public class CacheService(IDistributedCache cache, IConfiguration configuration) : ICacheService
 {
     private readonly TimeSpan _cacheExpiration =
-        TimeSpan.FromSeconds(configuration.GetValue<int?>("Cache:CacheTime") ?? 60);
+        TimeSpan.FromSeconds(configuration.GetValue("Cache:CacheTime", 60));
 
     /// <summary>
     /// Извлекает данные пациента из кэша по идентификатору.
