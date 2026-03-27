@@ -7,7 +7,7 @@ var gateway = builder.AddProject<Projects.ApiGateway>("apigateway");
 
 for (var i = 0; i < 5; ++i)
 {
-    var generationService = builder.AddProject<Projects.GenerationService>($"generation-service-{i + 1}", launchProfileName: null)
+    var generationService = builder.AddProject<Projects.GenerationService>($"generation-service-{i}", launchProfileName: null)
         .WithHttpEndpoint(8000 + i)
         .WithReference(cache, "RedisCache")
         .WaitFor(cache)
