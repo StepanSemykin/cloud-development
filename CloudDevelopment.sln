@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSink", "EventSink\EventSink.csproj", "{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{EA40C2FD-2BB7-4C99-91CA-389DFB28A8EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA40C2FD-2BB7-4C99-91CA-389DFB28A8EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA40C2FD-2BB7-4C99-91CA-389DFB28A8EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA40C2FD-2BB7-4C99-91CA-389DFB28A8EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA40C2FD-2BB7-4C99-91CA-389DFB28A8EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

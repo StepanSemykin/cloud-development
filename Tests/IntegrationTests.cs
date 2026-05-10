@@ -1,82 +1,150 @@
-using Aspire.Hosting;
-using Microsoft.Extensions.Logging;
-using Service.Api.Entities;
+using Domain.Entities;
 using System.Text.Json;
-using Xunit.Abstractions;
 
 namespace Tests;
 
 /// <summary>
-/// Интеграционные тесты для проверки микросервисного пайплайна
+/// РџСЂРѕРІРѕРґРёС‚ РёРЅС‚РµРіСЂР°С†РёРѕРЅРЅС‹Рµ С‚РµСЃС‚С‹.
 /// </summary>
-/// <param name="output">Служба журналирования юнит-тестов</param>
-public class IntegrationTests(ITestOutputHelper output) : IAsyncLifetime
+public class IntegrationTests(Fixture fixture) : IClassFixture<Fixture>
 {
-    private IDistributedApplicationTestingBuilder? _builder;
-    private DistributedApplication? _app;
+    private static readonly Random _random = new();
 
-    /// <inheritdoc/>
-    public async Task InitializeAsync()
+    /// <summary>
+    /// РџСЂРѕРІРµСЂСЏРµС‚ РїРѕР»РЅС‹Р№ РїР°Р№РїР»Р°Р№РЅ: РіРµРЅРµСЂР°С†РёСЏ РїР°С†РёРµРЅС‚Р°, РїСѓР±Р»РёРєР°С†РёСЏ РІ SNS, СЃРѕС…СЂР°РЅРµРЅРёРµ РІ S3.
+    /// </summary>
+    [Fact]
+    public async Task Pipeline()
     {
-        var cancellationToken = CancellationToken.None;
-        _builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.Aspire_AppHost>(cancellationToken);
-        _builder.Configuration["DcpPublisher:RandomizePorts"] = "false";
-        _builder.Services.AddLogging(logging =>
-        {
-            logging.AddXUnit(output);
-            logging.SetMinimumLevel(LogLevel.Debug);
-            logging.AddFilter("Aspire.Hosting.Dcp", LogLevel.Debug);
-            logging.AddFilter("Aspire.Hosting", LogLevel.Debug);
-        });
+        var id = _random.Next(1, 100);
+
+        using var gatewayClient = fixture.App.CreateHttpClient("apigateway", "http");
+        using var gatewayResponse = await gatewayClient.GetAsync($"/patient?id={id}");
+        var patient = JsonSerializer.Deserialize<MedicalPatient>(
+            await gatewayResponse.Content.ReadAsStringAsync());
+
+        var storageObjects = await fixture.WaitForObjectAsync($"patient_{id}.json");
+
+        using var sinkClient = fixture.App.CreateHttpClient("eventsink", "http");
+        using var listResponse = await sinkClient.GetAsync("/api/storage");
+        var fileList = JsonSerializer.Deserialize<List<string>>(
+            await listResponse.Content.ReadAsStringAsync());
+
+        using var storageResponse = await sinkClient.GetAsync($"/api/storage/patient_{id}.json");
+        var storagePatient = JsonSerializer.Deserialize<MedicalPatient>(
+            await storageResponse.Content.ReadAsStringAsync());
+
+        Assert.NotEmpty(storageObjects);
+        Assert.NotNull(fileList);
+        Assert.Contains($"patient_{id}.json", fileList);
+        Assert.NotNull(patient);
+        Assert.NotNull(storagePatient);
+        Assert.Equal(id, storagePatient.Id);
+        Assert.Equivalent(patient, storagePatient);
     }
 
     /// <summary>
-    /// Проверяет, что вызов гейтвея:
-    /// <list type="bullet">
-    /// <item><description>В ответ отправляет сгенерированный ЗУ</description></item>
-    /// <item><description>Сериализует ЗУ в S3 хранилище</description></item>
-    /// <item><description>Проверяет, что данные из предыдущих пунктов идентичны</description></item>
-    /// </list>
+    /// РџСЂРѕРІРµСЂСЏРµС‚ С‡С‚Рѕ Api Gateway РІРѕР·РІСЂР°С‰Р°РµС‚ 200.
     /// </summary>
-    /// <param name="envName">Запускаемый лаунч профайл</param>
-    [Theory]
-    [InlineData("SQS+MinioS3")]
-    [InlineData("SNS+MinioS3")]
-    [InlineData("SQS+LocalstackS3")]
-    [InlineData("SNS+LocalstackS3")]
-    public async Task TestPipeline(string envName)
+    [Fact]
+    public async Task Gateway()
     {
-        var cancellationToken = CancellationToken.None;
-        _builder!.Environment.EnvironmentName = envName;
-        _app = await _builder.BuildAsync(cancellationToken);
-        await _app.StartAsync(cancellationToken);
+        var id = _random.Next(1, 100);
 
-        var random = new Random();
-        var id = random.Next(1, 100);
-        using var gatewayClient = _app.CreateHttpClient("landplot-api-gateway", "http");
-        using var gatewayResponse = await gatewayClient!.GetAsync($"/land-plot?id={id}");
-        var apiLandplot = JsonSerializer.Deserialize<LandPlot>(await gatewayResponse.Content.ReadAsStringAsync());
+        using var gatewayClient = fixture.App.CreateHttpClient("apigateway", "http");
+        using var response = await gatewayClient.GetAsync($"/patient?id={id}");
 
-        await Task.Delay(5000);
-        using var sinkClient = _app.CreateHttpClient("landplot-sink", "http");
-        using var listResponse = await sinkClient!.GetAsync($"/api/s3");
-        var landplotList = JsonSerializer.Deserialize<List<string>>(await listResponse.Content.ReadAsStringAsync());
-        using var s3Response = await sinkClient!.GetAsync($"/api/s3/landplot_{id}.json");
-        var s3Landplot = JsonSerializer.Deserialize<LandPlot>(await s3Response.Content.ReadAsStringAsync());
-
-        Assert.NotNull(landplotList);
-        Assert.Single(landplotList);
-        Assert.NotNull(apiLandplot);
-        Assert.NotNull(s3Landplot);
-        Assert.Equal(id, s3Landplot.Id);
-        Assert.Equivalent(apiLandplot, s3Landplot);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    /// <inheritdoc/>
-    public async Task DisposeAsync()
+    /// <summary>
+    /// РџСЂРѕРІРµСЂСЏРµС‚ С‡С‚Рѕ РґР°РЅРЅС‹Рµ РїР°С†РёРµРЅС‚РѕРІ СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ РєРѕСЂСЂРµРєС‚РЅРѕ.
+    /// </summary>
+    [Fact]
+    public async Task MultiplePatients()
     {
-        await _app!.StopAsync();
-        await _app.DisposeAsync();
-        await _builder!.DisposeAsync();
+        var ids = Enumerable.Range(1, 3).Select(_ => _random.Next(100, 200)).ToList();
+
+        using var gatewayClient = fixture.App.CreateHttpClient("apigateway", "http");
+        foreach (var id in ids)
+            await gatewayClient.GetAsync($"/patient?id={id}");
+
+        foreach (var id in ids)
+            await fixture.WaitForObjectAsync($"patient_{id}.json");
+
+        using var sinkClient = fixture.App.CreateHttpClient("eventsink", "http");
+        using var listResponse = await sinkClient.GetAsync("/api/storage");
+        var fileList = JsonSerializer.Deserialize<List<string>>(
+            await listResponse.Content.ReadAsStringAsync());
+
+        Assert.NotNull(fileList);
+        foreach (var id in ids)
+            Assert.Contains($"patient_{id}.json", fileList);
+    }
+
+    /// <summary>
+    /// РџСЂРѕРІРµСЂСЏРµС‚ С‡С‚Рѕ СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ РІ S3 РЅРµ РїСѓСЃС‚РѕР№ РїРѕСЃР»Рµ РіРµРЅРµСЂР°С†РёРё.
+    /// </summary>
+    [Fact]
+    public async Task FileList()
+    {
+        var id = _random.Next(200, 300);
+
+        using var gatewayClient = fixture.App.CreateHttpClient("apigateway", "http");
+        await gatewayClient.GetAsync($"/patient?id={id}");
+        await fixture.WaitForObjectAsync($"patient_{id}.json");
+
+        using var sinkClient = fixture.App.CreateHttpClient("eventsink", "http");
+        using var listResponse = await sinkClient.GetAsync("/api/storage");
+        var fileList = JsonSerializer.Deserialize<List<string>>(
+            await listResponse.Content.ReadAsStringAsync());
+
+        Assert.NotNull(fileList);
+        Assert.NotEmpty(fileList);
+    }
+
+    /// <summary>
+    /// РџСЂРѕРІРµСЂСЏРµС‚ С‡С‚Рѕ С„Р°Р№Р» СЃРєР°С‡РёРІР°РµС‚СЃСЏ Рё РґРµСЃРµСЂРёР°Р»РёР·СѓРµС‚СЃСЏ РєРѕСЂСЂРµРєС‚РЅРѕ.
+    /// </summary>
+    [Fact]
+    public async Task DownloadingFile()
+    {
+        var id = _random.Next(300, 400);
+
+        using var gatewayClient = fixture.App.CreateHttpClient("apigateway", "http");
+        await gatewayClient.GetAsync($"/patient?id={id}");
+        await fixture.WaitForObjectAsync($"patient_{id}.json");
+
+        using var sinkClient = fixture.App.CreateHttpClient("eventsink", "http");
+        using var storageResponse = await sinkClient.GetAsync($"/api/storage/patient_{id}.json");
+        var patient = JsonSerializer.Deserialize<MedicalPatient>(
+            await storageResponse.Content.ReadAsStringAsync());
+
+        Assert.NotNull(patient);
+        Assert.Equal(id, patient.Id);
+        Assert.False(string.IsNullOrEmpty(patient.Name));
+        Assert.False(string.IsNullOrEmpty(patient.Address));
+    }
+
+    /// <summary>
+    /// РџСЂРѕРІРµСЂСЏРµС‚ С‡С‚Рѕ РїРѕРІС‚РѕСЂРЅС‹Р№ Р·Р°РїСЂРѕСЃ С‚РѕРіРѕ Р¶Рµ id РІРѕР·РІСЂР°С‰Р°РµС‚ РІРµСЂРЅРѕРіРѕ РїР°С†РёРµРЅС‚Р°.
+    /// </summary>
+    [Fact]
+    public async Task RetrieveFromCache()
+    {
+        var id = _random.Next(400, 500);
+
+        using var gatewayClient = fixture.App.CreateHttpClient("apigateway", "http");
+        using var firstResponse = await gatewayClient.GetAsync($"/patient?id={id}");
+        var firstPatient = JsonSerializer.Deserialize<MedicalPatient>(
+            await firstResponse.Content.ReadAsStringAsync());
+
+        using var secondResponse = await gatewayClient.GetAsync($"/patient?id={id}");
+        var secondPatient = JsonSerializer.Deserialize<MedicalPatient>(
+            await secondResponse.Content.ReadAsStringAsync());
+
+        Assert.NotNull(firstPatient);
+        Assert.NotNull(secondPatient);
+        Assert.Equivalent(firstPatient, secondPatient);
     }
 }

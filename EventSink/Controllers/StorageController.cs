@@ -6,12 +6,12 @@ using System.Text.Json.Nodes;
 namespace EventSink.Controllers;
 
 /// <summary>
-/// Контроллер для взаимодейсвия с S3.
+/// Контроллер для взаимодействия с S3.
 /// </summary>
 /// <param name="storageService">Служба для работы с S3.</param>
 /// <param name="logger">Логгер для записи событий и ошибок.</param>
 [ApiController]
-[Route("api/s3")]
+[Route("api/storage")]
 public class StorageController(IStorageService storageService, ILogger<StorageController> logger) : ControllerBase
 {
     /// <summary>

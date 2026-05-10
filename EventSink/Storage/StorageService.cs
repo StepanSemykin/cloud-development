@@ -65,12 +65,12 @@ public class StorageService(IAmazonS3 client, IConfiguration configuration, ILog
         JsonSerializer.Serialize(stream, rootNode);
         stream.Seek(0, SeekOrigin.Begin);
 
-        logger.LogInformation("Began uploading landplot {file} onto {bucket}", id, _bucketName);
+        logger.LogInformation("Began uploading patient {file} onto {bucket}", id, _bucketName);
 
         var request = new PutObjectRequest
         {
             BucketName = _bucketName,
-            Key = $"landplot_{id}.json",
+            Key = $"patient_{id}.json",
             InputStream = stream
         };
 
@@ -78,12 +78,12 @@ public class StorageService(IAmazonS3 client, IConfiguration configuration, ILog
 
         if (response.HttpStatusCode != HttpStatusCode.OK)
         {
-            logger.LogError("Failed to upload landplot {file}: {code}", id, response.HttpStatusCode);
+            logger.LogError("Failed to upload patient {file}: {code}", id, response.HttpStatusCode);
 
             return false;
         }
 
-        logger.LogInformation("Finished uploading landplot {file} to {bucket}", id, _bucketName);
+        logger.LogInformation("Finished uploading patient {file} to {bucket}", id, _bucketName);
 
         return true;
     }
