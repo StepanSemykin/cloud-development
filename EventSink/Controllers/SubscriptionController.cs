@@ -1,4 +1,4 @@
-using Amazon.SimpleNotificationService.Util;
+п»їusing Amazon.SimpleNotificationService.Util;
 using EventSink.Storage;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -6,19 +6,19 @@ using System.Text;
 namespace EventSink.Controllers;
 
 /// <summary>
-/// Контроллер для обработки входящих сообщений SNS.
+/// РљРѕРЅС‚СЂРѕР»Р»РµСЂ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё РІС…РѕРґСЏС‰РёС… СЃРѕРѕР±С‰РµРЅРёР№ SNS.
 /// </summary>
-/// <param name="storageService">Служба для загрузки данных в S3 хранилище.</param>
-/// <param name="logger">Логгер для записи событий и ошибок.</param>
+/// <param name="storageService">РЎР»СѓР¶Р±Р° РґР»СЏ Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С… РІ S3 С…СЂР°РЅРёР»РёС‰Рµ.</param>
+/// <param name="logger">Р›РѕРіРіРµСЂ РґР»СЏ Р·Р°РїРёСЃРё СЃРѕР±С‹С‚РёР№ Рё РѕС€РёР±РѕРє.</param>
 [ApiController]
 [Route("api/sns")]
 public class SubscriptionController(IStorageService storageService, ILogger<SubscriptionController> logger) : ControllerBase
 {
     /// <summary>
-    /// Принимает и обрабатывает входящее сообщение (подтверждение подписки и уведомления).
-    /// При получении уведомления содержимое сообщения сохраняется в S3.
+    /// РџСЂРёРЅРёРјР°РµС‚ Рё РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚ РІС…РѕРґСЏС‰РµРµ СЃРѕРѕР±С‰РµРЅРёРµ (РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РїРѕРґРїРёСЃРєРё Рё СѓРІРµРґРѕРјР»РµРЅРёСЏ).
+    /// РџСЂРё РїРѕР»СѓС‡РµРЅРёРё СѓРІРµРґРѕРјР»РµРЅРёСЏ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃРѕРѕР±С‰РµРЅРёСЏ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ S3.
     /// </summary>
-    /// <returns>Результат обработки HTTP-запроса.</returns>
+    /// <returns>Р РµР·СѓР»СЊС‚Р°С‚ РѕР±СЂР°Р±РѕС‚РєРё HTTP-Р·Р°РїСЂРѕСЃР°.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ReceiveMessage()

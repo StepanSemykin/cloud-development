@@ -1,4 +1,4 @@
-using Amazon.SimpleNotificationService;
+п»їusing Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Domain.Entities;
 using System.Net;
@@ -7,11 +7,11 @@ using System.Text.Json;
 namespace GenerationService.Messaging;
 
 /// <summary>
-/// Сервис для публикации сообщений в SNS.
+/// РЎРµСЂРІРёСЃ РґР»СЏ РїСѓР±Р»РёРєР°С†РёРё СЃРѕРѕР±С‰РµРЅРёР№ РІ SNS.
 /// </summary>
-/// <param name="client">Клиент SNS.</param>
-/// <param name="configuration">Конфигурация приложерния.</param>
-/// <param name="logger">Логгер для записи событий и ошибок.</param>
+/// <param name="client">РљР»РёРµРЅС‚ SNS.</param>
+/// <param name="configuration">РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ РїСЂРёР»РѕР¶РµСЂРЅРёСЏ.</param>
+/// <param name="logger">Р›РѕРіРіРµСЂ РґР»СЏ Р·Р°РїРёСЃРё СЃРѕР±С‹С‚РёР№ Рё РѕС€РёР±РѕРє.</param>
 public class PublicationService(IAmazonSimpleNotificationService client, IConfiguration configuration, ILogger<PublicationService> logger) : IProductionService
 {
     private readonly string _topicArn = configuration["AWS:Resources:SNSTopicArn"]

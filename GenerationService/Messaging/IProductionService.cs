@@ -1,15 +1,15 @@
-using Domain.Entities;
+п»їusing Domain.Entities;
 
 namespace GenerationService.Messaging;
 
 /// <summary>
-/// Интерфейс для службы публикации сообщений.
+/// РРЅС‚РµСЂС„РµР№СЃ РґР»СЏ СЃР»СѓР¶Р±С‹ РїСѓР±Р»РёРєР°С†РёРё СЃРѕРѕР±С‰РµРЅРёР№.
 /// </summary>
 public interface IProductionService
 {
     /// <summary>
-    /// Публикует сообщение с данными.
+    /// РџСѓР±Р»РёРєСѓРµС‚ СЃРѕРѕР±С‰РµРЅРёРµ СЃ РґР°РЅРЅС‹РјРё.
     /// </summary>
-    /// <param name="patient">Данные медицинского пациента для публикации.</param>
+    /// <param name="patient">Р”Р°РЅРЅС‹Рµ РјРµРґРёС†РёРЅСЃРєРѕРіРѕ РїР°С†РёРµРЅС‚Р° РґР»СЏ РїСѓР±Р»РёРєР°С†РёРё.</param>
     public Task SendMessage(MedicalPatient patient);
 }
