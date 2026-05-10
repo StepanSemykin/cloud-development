@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for medical patient project'
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name for the S3 bucket
+    Default: 'medical-patient-bucket'
+
+  TopicName:
+    Type: String
+    Description: Name for the SNS topic
+    Default: 'medical-patient-topic'
+
+Resources:
+  MedicalPatientBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: BucketName
+      VersioningConfiguration:
+        Status: Suspended
+      Tags:
+        - Key: Name
+          Value:
+            Ref: BucketName
+        - Key: Environment
+          Value: Sample
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  MedicalPatientTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName:
+        Ref: TopicName
+      DisplayName:
+        Ref: TopicName
+      Tags:
+        - Key: Name
+          Value:
+            Ref: TopicName
+        - Key: Environment
+          Value: Sample
+
+Outputs:
+  S3BucketName:
+    Description: Name of the S3 bucket
+    Value:
+      Ref: MedicalPatientBucket
+
+  S3BucketArn:
+    Description: ARN of the S3 bucket
+    Value:
+      Fn::GetAtt:
+        - MedicalPatientBucket
+        - Arn
+
+  SNSTopicName:
+    Description: Name of the SNS topic
+    Value:
+      Fn::GetAtt:
+        - MedicalPatientTopic
+        - TopicName
+
+  SNSTopicArn:
+    Description: ARN of the SNS topic
+    Value:
+      Ref: MedicalPatientTopic

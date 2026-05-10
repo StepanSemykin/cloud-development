@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{ABE66B30-BD47-A7B2-B17B-5BA67959B026}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSink", "EventSink\EventSink.csproj", "{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{ABE66B30-BD47-A7B2-B17B-5BA67959B026}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABE66B30-BD47-A7B2-B17B-5BA67959B026}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABE66B30-BD47-A7B2-B17B-5BA67959B026}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CBBB1B4-7A06-3A36-B43C-7E23470FCD46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

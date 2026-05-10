@@ -1,5 +1,6 @@
 ﻿using CachingService.Services;
 using Domain.Entities;
+using GenerationService.Messaging;
 
 namespace GenerationService.Services;
 
@@ -7,19 +8,20 @@ namespace GenerationService.Services;
 /// Сервис для генерации данных пациентов с поддержкой кэширования.
 /// </summary>
 /// <param name="cacheService">Сервис для работы с кэшем Redis.</param>
+/// <param name="producerService">Сервис для публикации сообщений в брокер.</param>
 /// <param name="logger">Логгер для записи событий и ошибок.</param>
-public class GeneratorService(ICacheService cacheService, ILogger<GeneratorService> logger) : IGeneratorService
+public class GeneratorService(ICacheService cacheService, IProductionService productionService, ILogger<GeneratorService> logger) : IGeneratorService
 {
     /// <summary>
     /// Обрабатывает запрос на генерацию данных пациента с указанным идентификатором.
     /// Cначала проверяет наличие данных в кэше, если данных нет - генерирует новые и сохраняет в кэш.
+    /// Публикует сообщение в брокер.
     /// </summary>
     /// <param name="id">Идентификатор пациента.</param>
     /// <returns>Сгенерированный объект <see cref="MedicalPatient"/> с заполненными полями.</returns>
     public async Task<MedicalPatient> GenerateAsync(int id)
     {
         MedicalPatient? cachedPatient = null;
-
         try
         {
             cachedPatient = await cacheService.RetriveFromCache(id);
@@ -56,6 +58,15 @@ public class GeneratorService(ICacheService cacheService, ILogger<GeneratorServi
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Cache write failed for Id {Id}", id);
+        }
+
+        try
+        {
+            await productionService.SendMessage(patient);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "SNS publish failed for Id {Id}", id);
         }
 
         return patient;
